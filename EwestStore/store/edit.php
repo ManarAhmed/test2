@@ -1,6 +1,6 @@
 <?php
 require_once '../db/connection.php';
-$query = 'select * from required where id =' . $_GET["id"];
+$query = 'select * from store where id =' . $_GET["id"];
 $result = mysqli_query($link, $query);
 $data = [];
 while ($row = mysqli_fetch_assoc($result)) {
@@ -21,18 +21,18 @@ while ($row2 = mysqli_fetch_assoc($result2)) {
 }
 
 mysqli_close($link);
-require_once '../layout/header.php';
+require_once '../layout/header.php'; 
 ?>
 
 <form class="form-horizontal" id="requiredForm">
-    <input type="hidden" id="required_id" name="required_id" class="form-control" value="<?php echo $data[0]['id'] ?>">
+    <input type="hidden" id="stored_id" name="stored_id" class="form-control" value="<?php echo $data[0]['id'] ?>">
     <div class="form-group">
         <label class="control-label col-sm-2" for="manu">Manufacturer</label>
         <div class="col-sm-10">
             <select id="manu" name="manufacturer" class="form-control">
                 <?php
                 foreach ($manufacturers as $key => $value) {
-                    if ($value['id'] == $data[0]['manufacturer']) {
+                    if ($value['id'] == $data[0]['manu_id']) {
                         echo "<option value='" . $value['id'] . "' selected>" . $value['name'] . "</option>";
                     } else {
                         echo "<option value='" . $value['id'] . "'>" . $value['name'] . "</option>";
@@ -48,7 +48,7 @@ require_once '../layout/header.php';
             <select id="dist" name="distribter" class="form-control">
                 <?php
                 foreach ($distributers as $key => $value) {
-                    if ($value['id'] == $data[0]['distributer']) {
+                    if ($value['id'] == $data[0]['dist_id']) {
                         echo "<option value='" . $value['id'] . "' selected>" . $value['name'] . "</option>";
                     } else {
                         echo "<option value='" . $value['id'] . "'>" . $value['name'] . "</option>";
@@ -77,41 +77,22 @@ require_once '../layout/header.php';
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-sm-2" for="req-quantity">Required Quantity</label>
+        <label class="control-label col-sm-2" for="quantity">Quantity</label>
         <div class="col-sm-10">
-            <input type="number" min="0" step="1" id="req-quantity" name=" req_quantity" class="form-control" value="<?php echo $data[0]['required_quantity'] ?>">
+            <input type="number" min="0" step="1" id="quantity" name=" quantity" class="form-control" value="<?php echo $data[0]['quantity'] ?>">
         </div>
     </div>
     <div class="form-group">
-        <label class="control-label col-sm-2" for="resp-user">Responsible User</label>
+        <label class="control-label col-sm-2" for="drawer_num">Drawer Number</label>
         <div class="col-sm-10">
-            <input type="text" id="resp-user" name="resp_user" class="form-control" value="<?php echo $data[0]['responsable_user'] ?>">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-2" for="project">Project</label>
-        <div class="col-sm-10">
-            <input type="text" id="project" name="project" class="form-control" value="<?php echo $data[0]['project'] ?>">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-2" for="priority">Priority</label>
-        <div class="col-sm-10">
-            <input type="number" id="priority" name="priority" class="form-control" value="<?php echo $data[0]['priority'] ?>">
-        </div>
-    </div>
-    <div class="form-group">
-        <label class="control-label col-sm-2" for="due-date">Due to date</label>
-        <div class="col-sm-10">
-            <input type="text" id="due-date" name="due_date" class="form-control" value="<?php echo $data[0]['due_date'] ?>">
+            <input type="number" min="1" step="1" id="drawer_num" name="drawer_num" class="form-control" value="<?php echo $data[0]['drawer_num'] ?>">
         </div>
     </div>
     <div class="form-group">        
         <div class="col-sm-offset-2 col-sm-10">
-            <input type="button" value="Update" id="update" class="btn btn-info" name="update">
+            <input type="button" value="Update" id="update_stored" class="btn btn-info" name="update_stored">
         </div>
     </div>
 </form>
 
 <?php require_once '../layout/footer.php'; ?>
-

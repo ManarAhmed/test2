@@ -1,45 +1,48 @@
 <?php
-header('Access_Control_Allow_Origin: *');
-require_once dirname(__FILE__).'/config.php';
 
-//connect to database
-$link = @mysqli_connect(
-        $config['server'],
-        $config['username'],
-        $config['password'],
-        $config['database']
-        );
-if(!$link){
-    die('Error: ' . mysqli_connect_error());
+require_once './connection.php';
+
+//print_r($_REQUEST);exit;
+if (isset($_REQUEST['store']) || isset($_REQUEST['update'])) {
+    $manufacturer = $_REQUEST['manufacturer'];
+    $distributer = $_REQUEST['distribter'];
+    $manu_part_num = $_REQUEST['manu_num'];
+    $dist_part_num = $_REQUEST['dist_num'];
+    $package = $_REQUEST['package'];
+    $required_quantity = $_REQUEST['req_quantity'];
+    $responsable_user = $_REQUEST['resp_user'];
+    $project = $_REQUEST['project'];
+    $priority = $_REQUEST['priority'];
+    $due_date = $_REQUEST['due_date'];
+
+    if (isset($_REQUEST['store'])) {
+        $query = "INSERT INTO required(manufacturer, distributer, manu_part_num, dist_part_num, package, required_quantity, responsable_user, project, priority, due_date)"
+                . " VALUES ('$manufacturer','$distributer','$manu_part_num','$dist_part_num','$package',$required_quantity,'$responsable_user','$project',$priority,'$due_date')";
+    } elseif (isset($_REQUEST['update'])) {
+        $id = $_REQUEST['id'];
+        $query = "UPDATE required SET"
+                . " manufacturer = $manufacturer, distributer = $distributer, manu_part_num = '$manu_part_num',"
+                . " dist_part_num = '$dist_part_num', package = '$package', required_quantity = $required_quantity,"
+                . "responsable_user = '$responsable_user', project = '$project', priority = $priority, "
+                . "due_date = '$due_date' WHERE id =" . $id;
+    }
+} elseif (isset($_REQUEST["delete"])) {
+    $id = $_REQUEST['id'];
+    $query = "DELETE FROM required WHERE id = " . $id;
+} else {
+    print_r('proplem');
+    exit;
 }
 
-$manufacturer = $_POST['manufacturer'];
-$distributer = $_POST['distribter'];
-$manu_part_num = $_POST['manu_num'];
-$dist_part_num = $_POST['dist_num'];
-$package = $_POST['package'];
-$required_quantity = $_POST['req_quantity'];
-$responsable_user = $_POST['resp_user'];
-$project = $_POST['project'];
-$priority = $_POST['priority'];
-$due_date = $_POST['due_date'];
-
-$query = "insert into required(manufacturer, distributer, manu_part_num, dist_part_num, package, required_quantity, responsable_user, project, priority, due_date)"
-        . " values ('$manufacturer','$distributer','$manu_part_num','$dist_part_num','$package',$required_quantity,'$responsable_user','$project',$priority,'$due_date')";
-
-
 if (mysqli_query($link, $query)) {
-    echo "New record created successfully";
+    if (isset($_REQUEST['store'])) {
+        echo "New record created successfully";
+    } elseif (isset($_REQUEST['update'])) {
+        echo "Record updated successfully";
+    } elseif (isset($_REQUEST['delete'])) {
+        echo "Record deleted successfully";
+    }
 } else {
     echo "Error: " . $query . "<br>" . mysqli_error($link);
 }
-
 mysqli_close($link);
-
-
-
-//if(isset($_POST['submit'])){
-//    echo 'server success';
-//}  else {
-//    echo 'server error';    
-//}

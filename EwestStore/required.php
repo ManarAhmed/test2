@@ -1,130 +1,68 @@
 <?php
-header('Access_Control_Allow_Origin: *');
-require_once dirname(__FILE__) . '/db/config.php';
-
-//connect to database
-$link = @mysqli_connect(
-                $config['server'], $config['username'], $config['password'], $config['database']
-);
-if (!$link) {
-    die('Error: ' . mysqli_connect_error());
-}
-
-$query = "select * from required";
+require_once './db/connection.php';
+$query = "select r.id,m.name as manufacturer, d.name as distributer, r.manu_part_num, r.dist_part_num,"
+        . " r.package, r.required_quantity, r.responsable_user, r.project, r.priority, r.due_date "
+        . "from required r, manufacturer m, distributer d "
+        . "where d.id = r.distributer and m.id = r.manufacturer";
 $result = mysqli_query($link, $query);
 $data = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $data[] = $row;
 }
 mysqli_close($link);
+//echo '<pre>';
+//print_r($data);
+//echo '</pre>';
+//exit();
+require_once './layout/header.php';
 ?>
 
-<!DOCTYPE html>
-<!--
-To change this license header, choose License Headers in Project Properties.
-To change this template file, choose Tools | Templates
-and open the template in the editor.
--->
-<html>
-    <head>
-        <meta charset="UTF-8">
+<div class="row">
+    <div class="col-sm-offset-4 col-sm-4 text-center" style="font-size: 22px; font-weight: bold; color: #d9534f;">Required</div>
+</div>
+<div style="height: 30px;"></div>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">ID</th>
+                <th class="text-center">Manufacturer Part-num</th>
+                <th class="text-center">Package</th>
+                <th class="text-center">Required Quantity</th>
+                <th class="text-center">Project</th>
+                <th class="text-center">Priority</th>
+                <th class="text-center">Due to date</th>
+                <th class="text-center" colspan="3"></th>
+            </tr>
 
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title></title>
+        </thead>
+        <tbody>
+            <?php
+            foreach ($data as $key => $value) {
+                echo'<tr>';
+                echo '<td class="text-center" >' . $value['id'] . '</td>';
+                echo '<td class="text-center" >' . $value['manu_part_num'] . '</td>';
+                echo '<td class="text-center" >' . $value['package'] . '</td>';
+                echo '<td class="text-center" >' . $value['required_quantity'] . '</td>';
+                echo '<td class="text-center" >' . $value['project'] . '</td>';
+                echo '<td class="text-center" >' . $value['priority'] . '</td>';
+                echo '<td class="text-center" >' . $value['due_date'] . '</td>';
+                    
+                echo '<td class="text-center" nowrap>'
+                . '<a href="http://localhost/EwestStore/required/show.php?id=' . $value['id'] . '"  class="btn btn-success" name="show" style="margin:5px;">show</a>'
+                . '<a href="http://localhost/EwestStore/required/edit.php?id=' . $value['id'] . '" class="btn btn-warning" name="update" style="margin:5px;">Edit</a>'
+                . '<input type="button" id="' . $value['id'] . '" class="btn btn-danger delete" name="delete" value="Delete" style="margin:5px;">'
+                . '</td>';
+                echo '</tr>';
+            }
+            ?>
+        </tbody>
+    </table>
+</div>
 
-        <!-- Bootstrap Core CSS -->
-        <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<!-- Dialog -->
+<div id="dialog-confirm" title="Delete required component?" style="display: none">
+    <p style="font-size: 16px; "><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>These item will be permanently deleted and cannot be recovered.<br><h4>Are you sure?</h4></p>
+</div>
 
-        <!-- Custom Fonts -->
-        <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-        <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
-        <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-        <!--[if lt IE 9]>
-            <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-            <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
-        <![endif]-->
-    </head>
-    <body>
-        <nav class="navbar navbar-default">
-            <div class="container-fluid">
-                <!-- Brand and toggle get grouped for better mobile display -->
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="http://localhost/EwestStore">Brand</a>
-                </div>
-
-                <!-- Collect the nav links, forms, and other content for toggling -->
-                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="http://localhost/EwestStore/store.php">Store <span class="sr-only">(current)</span></a></li>
-                        <li><a href="http://localhost/EwestStore/required.php">Required</a></li>
-                    </ul>
-                </div><!-- /.navbar-collapse -->
-            </div><!-- /.container-fluid -->
-        </nav>
-
-
-        <div style="height: 30px;"></div>
-
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-offset-4 col-sm-4 text-center" style="font-size: 22px; font-weight: bold; color: #d9534f;">Required</div>
-            </div>
-            <div style="height: 30px;"></div>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th class="text-center">ID</th>
-                            <th class="text-center">Manufacturer</th>
-                            <th class="text-center">Distributer</th>
-                            <th class="text-center">Manufacturer Part-num</th>
-                            <th class="text-center">Distributer Part-num</th>
-                            <th class="text-center">Package</th>
-                            <th class="text-center">Required Quantity</th>
-                            <th class="text-center">Responsible User</th>
-                            <th class="text-center">Project</th>
-                            <th class="text-center">Priority</th>
-                            <th class="text-center">Due to date</th>
-                            <th class="text-center" colspan="3"></th>
-                        </tr>
-
-                    </thead>
-                    <tbody>
-                        <?php
-                        foreach ($data as $key => $value) {
-                            echo'<tr>';
-                            foreach ($value as $x)
-                                echo '<td class="text-center">' . $x . '</td>';
-                            echo '<td class="text-center"><a href="#" class="btn btn-success">show</a>'
-                            . '<a href="http://localhost/EwestStore/required?id=$value[id]" class="btn btn-warning">Edit</a>'
-                            . '<a href="#" class="btn btn-danger">Delete</a></td>';
-                            echo '</tr>';
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-
-
-
-
-
-
-        <!-- jQuery -->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <!-- Bootstrap Core JavaScript -->
-        <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-        <!-- Plugin JavaScript -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
-
-    </body>
-</html>
+<?php require_once './layout/footer.php'; ?>
